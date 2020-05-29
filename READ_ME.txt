@@ -1,0 +1,3 @@
+SP 18 Weather
+___________________________________________________________
+Initial data curation of weather data from Clinton and Kinston research stations
