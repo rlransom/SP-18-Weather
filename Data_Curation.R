@@ -43,11 +43,9 @@ tail(Kinston)
 
 #Add New Column, "Location Name"
 Location_Name <-rep("kinston", nrow(Kinston))
-Clinton <- cbind(Location_Name, Kinston)
+Kinston <- cbind(Location_Name, Kinston)
 
 #Join tables
 Monthly_Weather <- dplyr::full_join(Clinton, Kinston)
 
-#Filter out dates before June 2018
-  
-  
+#Change Date Column from "Character" to "Date" class
