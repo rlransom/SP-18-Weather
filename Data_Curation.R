@@ -8,7 +8,7 @@
 
 #Load necessary packages
 #install.packages("tidyverse")
-#Clear Envieronment
+#Clear Environment
 remove(list = ls())
 
 
