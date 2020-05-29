@@ -2,7 +2,7 @@
 ##Weather Data for 2018 SP Growing Season - Clinton and Kinston
 ###############################################################
 
-#Driving Question: What weather factors greately impact the shape and growth of sweet potatoes?
+#Driving Question: What weather factors greatly impact the shape and growth of sweet potatoes?
 
 ###############################################################
 
