@@ -2,18 +2,21 @@
 ##Weather Data for 2018 SP Growing Season - Clinton and Kinston
 ###############################################################
 
-#Driving Question: What weather factors greatly impact the shape and growth of sweet potatoes?
+#Driving Question: What weather factors greatly impact the shape and growth of sweetpotatoes?
 
 ###############################################################
 
 #Load necessary packages
 #install.packages("tidyverse")
+load(dplyr)
+
+
 #Clear Environment
 remove(list = ls())
 
 
 #Load Raw Data from Clinton Research Station Site
-Clinton <- read.csv("RAW_Clinton.csv")
+Clinton <- read_csv("RAW_Clinton.csv")
 
 #Inspect Data
 ##Column names
@@ -30,7 +33,7 @@ Clinton <- cbind(Location_Name, Clinton)
 
 
 #Load Raw Data from Kinston Research Station Site
-Kinston <- read.csv("RAW_Kinston.csv")
+Kinston <- read_csv("RAW_Kinston.csv")
 
 #Inspect Data
 ##Column names
@@ -47,5 +50,10 @@ Kinston <- cbind(Location_Name, Kinston)
 
 #Join tables
 Monthly_Weather <- dplyr::full_join(Clinton, Kinston)
+
+#Rename columns
+colnames(Monthly_Weather)
+Monthly_Weather <- dplyr::rename(Monthly_Weather, 
+
 
 #Change Date Column from "Character" to "Date" class
