@@ -34,7 +34,7 @@ Monthly_Weather <- dplyr::full_join(Clinton, Kinston)
 colnames(Monthly_Weather)
 ##Structure of data
 str(Monthly_Weather)
-##Head/Tain of data
+##Head/Tail of data
 head(Monthly_Weather)
 tail(Monthly_Weather)
 
