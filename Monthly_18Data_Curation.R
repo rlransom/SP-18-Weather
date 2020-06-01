@@ -12,16 +12,15 @@ remove(list = ls())
 install.packages("tidyverse")
 library(readr)
 
-
 #Load Raw Data from Clinton Research Station Site
-Clinton <- read_csv("RAW_Clinton.csv")
+Clinton <- read_csv("RAW_Clinton18_Monthly.csv")
 
 #Add location identifier
 Location_Name <-rep("clinton", nrow(Clinton))
 Clinton <- cbind(Location_Name, Clinton)
 
 #Load Raw Data from Kinston Research Station Site
-Kinston <- read_csv("RAW_Kinston.csv")
+Kinston <- read_csv("RAW_Kinston18_Monthly.csv")
 
 #Add location identifier
 Location_Name <-rep("kinston", nrow(Kinston))
