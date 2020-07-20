@@ -20,7 +20,7 @@ library("readxl")
 library("naniar")
 library("lubridate")
 
-#Load Raw Data
+#Load Local Raw Data
 Clinton18<- read_excel("./Raw_Data/Readable_Clinton_Weather_2018.xlsx")
 Clinton19 <- read_excel("./Raw_Data/Readable_Clinton_Weather_2019.xlsx")
 Cunningham18 <- read_excel("./Raw_Data/Readable_Cunningham_Weather_2018.xlsx")
@@ -29,49 +29,10 @@ Cunningham19 <- read_excel("./Raw_Data/Readable_Cunningham_Weather_2019.xlsx")
 
 
 
-# #Create our Dataframe to work with
-# ##Add Location column to each table
-# 
-#Clinton 2018
-#Add "Location" Column
-Location <- "Clinton"
-Location <- rep(Location, nrow(Clinton18))
-Clinton18 <- cbind(Location, Clinton18)
-#Re-order Columns
-Clinton18 <- Clinton18[,c(2,1,3:18)]
 
 #Temporary
 Data <- Clinton18
 
-
-# 
-# #Clinton 2019
-# #Add "Location" Column
-# Location <- "Clinton"
-# Location <- rep(Location, nrow(Clinton19))
-# Clinton19 <- cbind(Location, Clinton19)
-# #Re-order Columns
-# Clinton19 <- Clinton19[,c(2,1,3:18)]
-# 
-# #Cunningham 2018
-# #Add "Location" Column
-# Location <- "Cunningham"
-# Location <- rep(Location, nrow(Cunningham18))
-# Cunningham18 <- cbind(Location, Cunningham18)
-# #Re-order Columns
-# Cunningham18 <- Cunningham18[,c(2,1,3:18)]
-# 
-# #Cunningham 2019
-# #Add "Location" Column
-# Location <- "Cunningham"
-# Location <- rep(Location, nrow(Cunningham19))
-# Cunningham19 <- cbind(Location, Cunningham19)
-# #Re-order Columns
-# Cunningham19 <- Cunningham19[,c(2,1,3:18)]
-# 
-# ##Combine data with same year
-# ##2018 hard wired for now, will make this user defined later
-# Data <- bind_rows(Clinton18, Cunningham18)
 
 
 
@@ -96,7 +57,7 @@ Data <- naniar::replace_with_na_if(Data, .predicate = is.character, condition = 
 ######################
 ##Data Processing
 #Change column type to numeric
-names <- colnames(Data)[-c(1:2)]
+names <- colnames(Data)[-1]
 Data <- Data %>%
   mutate_at(names, as.numeric)
 
@@ -111,36 +72,56 @@ Data <- Data %>%
   mutate(Week = lubridate::week(Date))
 #Select columns to take sum
 s <- Data %>%
-  select(Week, Hourly_Precipitation)%>%
+  select(Week, Precipitation)%>%
   na.omit()
 #Sum by week
-s <- aggregate(s$Hourly_Precipitation, by=list(Week=s$Week), FUN=sum)
+s <- s %>%
+  group_by(Week)%>%
+  summarise_all(sum, na.rm=TRUE)
+
 
 #Select columns to take average
 names <- colnames(Data)
-bye <- match(c("Date", "Location", "Hourly_Precipitation", "Week"), names)
+bye <- match(c("Date", "Precipitation", "Week"), names)
 names <- names[-c(bye)]
 
 a <- Data %>%
-  select(Week, names)%>%
-  na.omit()
-#Issue- na.omit is causing us to lose the last two weeks since heat index is empty for those weeks. 
-
+  select(Week, names)
 
 #Average by week
-Aa <- aggregate(. ~ Week, a, mean)
-  
-######################
-#Summary statistics
-summary(Data)
-#We now see some basic stats about each variable
+a <- a %>%
+  group_by(Week)%>%
+  summarize_all(mean, na.rm=TRUE)
+a <- round(a, digits = 2)
+
+##Combine averaged and summarized dataframes into one dataframe
+Data <- full_join(a,s, by= "Week")
+
+#Add location and year column
+Year <- "2018"
+Year <- rep(Year, nrow(Data))
+Data <- cbind(Year, Data)
+#Enter the location the data was collected from
+Location <- "Clinton"
+Location <- rep(Location, nrow(Data))
+Data <- cbind(Location, Data)
+
+Data <- as.data.frame(Data)
+
+####################################
+#Reformat Data
+#Clinton 2018 Planting date: June 14, 2018. The 24th week of 2018.
+#Remove weeks before this
+
+Data <- Data %>%
+  filter(Week >= 24)
+#Clinton 2018 Harvest ended in week 42
+Data <- Data %>%
+  filter(Week <= 42)
+
+#Week column should signifity weeks since planting week, so subtract 24 frome each
+Data$Week <- Data$Week - 24
 
 
-#Preliminary Visualization
-Clinton %>%
-  ggplot() +
-  geom_point(mapping = aes(x = DateTime, y = Air_Temp_Avg)) +
-  xlab("Date") +
-  ylab("Temperature (F)") +
-  ggtitle("Average Temperature")+
-  theme_light()
+##Export tidied data
+write_csv(Data, path = "Exported_Data/Tidy_Clinton_2018.csv")
